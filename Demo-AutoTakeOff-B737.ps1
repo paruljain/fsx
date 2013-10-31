@@ -1,4 +1,4 @@
-# Requires fsx.simconnect.ps1 in the same folder
+# Requires fsx-simconnect.ps1 in the same folder
 if (!$global:connected) {
     . .\fsx-simconnect.ps1
 }
