@@ -1,3 +1,4 @@
+# Requires fsx.simconnect.ps1 in the same folder
 if (!$global:connected) {
     . .\fsx-simconnect.ps1
 }
@@ -32,16 +33,16 @@ transmit -eventId AP_ALT_VAR_SET_ENGLISH -param 3000
 # AP Alt Hold on
 transmit -eventId AP_ALT_HOLD_ON
 # Wait for speed to reach 140 knots before engaging AP to take off
-while ($global:response.Airspeed_Indicated -lt 140) {}
+while ($global:response.Airspeed_Indicated -lt 140) { Start-Sleep -Seconds 1 }
 # Engage AP to take off!
 transmit -eventId AUTOPILOT_ON
 # Set rate of climb to 2500 ft/min
 transmit -eventId AP_VS_VAR_SET_ENGLISH -param 2500
 # Wait for altitude runway + 200 feet then retract landing gear and flaps
-while (($global:response.Plane_Altitude - $runwayAlt) -lt 200) {}
+while (($global:response.Plane_Altitude - $runwayAlt) -lt 200) { Start-Sleep -Seconds 1}
 # Retract flaps
 transmit -eventId FLAPS_UP
-Start-Sleep 8
+Start-Sleep -Seconds 10
 # Retract landing gear
 transmit -eventId GEAR_UP
 
