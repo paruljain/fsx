@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fsx>
+    <var name="Title" type="string"/>
+
+    <!-- Simulation Variables. These provide data about current state of user aircraft -->
+    <!-- Position -->
+    <var name="Plane Latitude" type="double" unit="radians"/>
+    <var name="Plane Longitude" type="double" unit="radians"/>
+    <var name="Plane Altitude" type="double" unit="feet"/>
+    <var name="Airspeed Indicated" type="double" unit="knots"/>
+
+    <!-- Radios -->
+    <var name="Com Active Frequency:1" type="double" unit="MHz"/>
+    <var name="Com Active Frequency:2" type="double" unit="MHz"/>
+    <var name="Com Standby Frequency:1" type="double" unit="MHz"/>
+    <var name="Com Standby Frequency:2" type="double" unit="MHz"/>
+    <var name="Nav Active Frequency:1" type="double" unit="MHz"/>
+    <var name="Nav Active Frequency:2" type="double" unit="MHz"/>
+    <var name="Nav Standby Frequency:1" type="double" unit="MHz"/>
+    <var name="Nav Standby Frequency:2" type="double" unit="MHz"/>
+
+    <!-- Auto Pilot -->
+    <var name="Autopilot Master" type="int"/>
+    <var name="Autopilot Approach Hold" type="int"/>
+    
+    <var name="Autopilot Heading Lock" type="int"/>
+    <var name="Autopilot Heading Lock Dir" type="double" unit="degrees"/>
+    
+    <var name="Autopilot Altitude Lock" type="int"/>
+    <var name="Autopilot Altitude Lock Var" type="double" unit="feet"/>
+    <var name="Autopilot Vertical Hold Var" type="double" unit="feet/minute"/>
+    
+    <var name="Autopilot Throttle Arm" type="int"/>
+    <var name="Autopilot Airspeed Hold" type="int"/>
+    <var name="Autopilot Airspeed Hold Var" type="double" unit="knots"/>
+
+    <var name="Autopilot Nav1 Lock" type="int"/>
+    <var name="Gps Drives Nav1" type="int"/>
+
+    <!-- Engines -->
+    <var name="Number Of Engines" type="int"/>
+    <var name="General Eng Throttle Lever Position:1" type="double"/>
+    <var name="General Eng Throttle Lever Position:2" type="double"/>
+    <var name="General Eng Throttle Lever Position:3" type="double"/>
+    <var name="General Eng Throttle Lever Position:4" type="double"/>
+
+    <!-- Other controls -->
+    <var name="Flaps Handle Percent" type="double"/>
+    <var name="Gear Handle Position" type="int"/>
+    <var name="Spoilers Armed" type="int"/>
+    <var name="Spoilers Handle Position" type="double"/>
+    <var name="Brake Left Position" type="double"/>
+    <var name="Brake Right Position" type="double"/>
+
+    <!-- Events. These are transmitted to FSX to control the aircraft -->
+
+    <eventid name="AUTOPILOT_ON"/>
+    <eventid name="AUTOPILOT_OFF"/>
+    <eventid name="HEADING_BUG_INC"/>
+    <eventid name="HEADING_BUG_DEC"/>
+    <eventid name="AP_ALT_VAR_INC"/>
+    <eventid name="AP_ALT_VAR_DEC"/>
+    <eventid name="AP_ALT_HOLD_ON"/>
+    <eventid name="AP_ALT_HOLD_OFF"/>
+    <eventid name="AP_HDG_HOLD_ON"/>
+    <eventid name="AP_HDG_HOLD_OFF"/>
+    <eventid name="AUTO_THROTTLE_ARM"/>
+    <eventid name="AP_APR_HOLD_ON"/>
+    <eventid name="AP_APR_HOLD_OFF"/>
+    <eventid name="AP_AIRSPEED_ON"/>
+    <eventid name="AP_AIRSPEED_OFF"/>
+    <eventid name="AP_SPD_VAR_INC"/>
+    <eventid name="AP_SPD_VAR_DEC"/>
+    <eventid name="AP_ALT_VAR_SET_ENGLISH"/>
+    <eventid name="AP_VS_VAR_SET_ENGLISH"/>
+    <eventid name="AP_SPD_VAR_SET"/>
+    <eventid name="HEADING_BUG_SET"/>
+    <eventid name="FLAPS_UP"/>
+    <eventid name="FLAPS_DOWN"/>
+    <eventid name="FLAPS_1"/>
+    <eventid name="FLAPS_2"/>
+    <eventid name="FLAPS_3"/>
+    <eventid name="FLAPS_SET"/>
+    <eventid name="SPOILERS_ARM_ON"/>
+    <eventid name="SPOILERS_ARM_OFF"/>
+    <eventid name="SPOILERS_ON"/>
+    <eventid name="SPOILERS_OFF"/>
+    <eventid name="GEAR_UP"/>
+    <eventid name="GEAR_DOWN"/>
+    <eventid name="NAV1_STBY_SET"/>
+    <eventid name="NAV1_RADIO_SWAP"/>
+    <eventid name="VOR1_SET"/>
+    <eventid name="THROTTLE_SET"/>
+    <eventid name="AXIS_LEFT_BRAKE_SET"/>
+    <eventid name="AXIS_RIGHT_BRAKE_SET"/>
+    <eventid name="BRAKES"/>
+    <eventid name="ATC"/>
+    <eventid name="ATC_MENU_1"/>
+    <eventid name="ATC_MENU_2"/>
+    <eventid name="ATC_MENU_3"/>
+    <eventid name="ATC_MENU_4"/>
+    <eventid name="ATC_MENU_5"/>
+    <eventid name="ATC_MENU_6"/>
+    <eventid name="ATC_MENU_7"/>
+    <eventid name="ATC_MENU_8"/>
+    <eventid name="ATC_MENU_9"/>
+    <eventid name="ATC_MENU_0"/>
+    <eventid name="AP_NAV1_HOLD_ON"/>
+    <eventid name="AP_NAV1_HOLD_OFF"/>
+    <eventid name="TOGGLE_GPS_DRIVES_NAV1"/>
+</fsx>
