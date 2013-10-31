@@ -95,7 +95,9 @@ function convert-IntToUint([int32]$number) {
 Unregister-Event *
 $global:connected = $false
 
-$global:fsx = New-Object Microsoft.FlightSimulator.SimConnect.SimConnect("test", 0, 1026, $null, 0)
+try { $global:fsx = New-Object Microsoft.FlightSimulator.SimConnect.SimConnect('PowerShell', 0, 1026, $null, 0) }
+catch { 'Unable to connect to FSX. Please make sure FSX is started'; exit }
+
 [EventId].GetEnumValues() | % { 
     $global:fsx.MapClientEventToSimEvent($_, $_.ToString())
 }
@@ -115,7 +117,7 @@ foreach ($var in $config.fsx.var) {
     }
 }
 
-$method = [Microsoft.FlightSimulator.SimConnect.SimConnect].GetMethod("RegisterDataDefineStruct")
+$method = [Microsoft.FlightSimulator.SimConnect.SimConnect].GetMethod('RegisterDataDefineStruct')
 $closedMethod = $method.MakeGenericMethod([Struct1])
 $closedMethod.Invoke($global:fsx, [Definitions]::Struct1)
 
@@ -132,9 +134,10 @@ Register-ObjectEvent -InputObject $global:timer -EventName Elapsed -Action { $gl
 $timer.Start()
 
 # Example transmit
+# Set Autopilot altitude reference in feet
 # transmit -eventId AP_ALT_VAR_SET_ENGLISH -param 4000
 
-# Print simlation variables
+# Print simulation variables
 # $global:response
 
 # Print altitude
