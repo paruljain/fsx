@@ -134,7 +134,7 @@ $timer.Start()
 # Example transmit
 # transmit -eventId AP_ALT_VAR_SET_ENGLISH -param 4000
 
-# Print simlation variabled
+# Print simlation variables
 # $global:response
 
 # Print altitude
