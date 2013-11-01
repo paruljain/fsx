@@ -4,27 +4,20 @@ $scriptPath = Split-Path -parent $MyInvocation.MyCommand.Definition
 # If running on 64 bit OS make sure that 32 bit version of PowerShell is being used
 if ((Get-WMIObject win32_OperatingSystem).OsArchitecture -match '64-bit') {
     if ([System.Diagnostics.Process]::GetCurrentProcess().Path -notmatch '\\syswow64\\') {
-        'Please run this script with 32-bit version of PowerShell'
-        'Both 32-bit and 64-bit versions are installed by default on a 64-bit OS'
-        'The 32-bit of PowerShell is usually ' + $env:windir + '\SysWOW64\WindowsPowerShell\v1.0\powershell.exe'
-        'The 32-bit of PowerShell Development Tool is usually ' + $env:windir + '\SysWOW64\WindowsPowerShell\v1.0\powershell_ise.exe'
-        exit
+        throw 'Please run this script with 32-bit version of PowerShell'
     }
 }
 
 # Make sure that SP2 SIMCONNECT DLL is available
 $ref = @($env:windir + '\assembly\GAC_32\Microsoft.FlightSimulator.SimConnect\10.0.61259.0__31bf3856ad364e35\Microsoft.FlightSimulator.SimConnect.dll')
 if (!(Test-Path $ref)) {
-    "Cannot find $ref"
-    'Make sure FSX SP2 is installed'
-    exit
+    throw "Cannot find $ref. Make sure FSX SP2 is installed"
 }
 
 [System.Reflection.Assembly]::LoadFrom($ref) | Out-Null
 
 try { $config = [xml](gc "$scriptPath\fsx.xml") }
-catch { 'Unable to find fsx.xml in script folder, or fsx.xml not in proper xml form'; exit }
-
+catch { throw 'Unable to find fsx.xml in script folder, or fsx.xml not in proper xml form' }
 
 
 if (-not ('DataRequests' -as [type])) {
@@ -92,11 +85,8 @@ function convert-IntToUint([int32]$number) {
     [bitconverter]::ToUInt32($bytes, 0)
 }
 
-Unregister-Event *
-$global:connected = $false
-
 try { $global:fsx = New-Object Microsoft.FlightSimulator.SimConnect.SimConnect('PowerShell', 0, 1026, $null, 0) }
-catch { 'Unable to connect to FSX. Please make sure FSX is started'; exit }
+catch { throw 'Unable to connect to FSX. Please make sure FSX is started' }
 
 [EventId].GetEnumValues() | % { 
     $global:fsx.MapClientEventToSimEvent($_, $_.ToString())
@@ -115,15 +105,21 @@ foreach ($var in $config.fsx.var) {
     if ($dataDefTypeMap.ContainsKey($var.type)) {
         $global:fsx.AddToDataDefinition([Definitions]::Struct1, $var.name, $var.unit, $dataDefTypeMap[$var.type], 0, [Microsoft.FlightSimulator.SimConnect.SimConnect]::SIMCONNECT_UNUSED)
     }
+    else { throw 'Error: fsx.xml: The Type for variable ' + $var.name + ' is not recognized' }
 }
 
+# Many thanks to Lee Holmes for the following three lines that enables calling generic SIMCONNECT function from PowerShell
+# http://www.leeholmes.com/blog/2006/08/18/creating-generic-types-in-powershell/
 $method = [Microsoft.FlightSimulator.SimConnect.SimConnect].GetMethod('RegisterDataDefineStruct')
 $closedMethod = $method.MakeGenericMethod([Struct1])
 $closedMethod.Invoke($global:fsx, [Definitions]::Struct1)
 
-Register-ObjectEvent -InputObject $global:fsx -EventName OnRecvOpen -Action { $global:connected = $true } | out-null
-Register-ObjectEvent -InputObject $global:fsx -EventName OnRecvQuit -Action { $global:connected = $false } | out-null
-Register-ObjectEvent -InputObject $global:fsx -EventName OnRecvSimobjectData -Action { try { $global:response = $args.dwData[0] } catch {} } | out-null
+$global:fsxConnected = $true
+$global:fsxError = $false
+Unregister-Event *
+Register-ObjectEvent -InputObject $global:fsx -EventName OnRecvException -Action { $global:fsxError = $true } | out-null
+Register-ObjectEvent -InputObject $global:fsx -EventName OnRecvQuit -Action { $global:fsxConnected = $false } | out-null
+Register-ObjectEvent -InputObject $global:fsx -EventName OnRecvSimobjectData -Action { try { $global:sim = $args.dwData[0] } catch {} } | out-null
 
 $global:fsx.RequestDataOnSimObject([DataRequests]::Request1, [Definitions]::Struct1, [Microsoft.FlightSimulator.SimConnect.SimConnect]::SIMCONNECT_OBJECT_ID_USER, [Microsoft.FlightSimulator.SimConnect.SIMCONNECT_PERIOD]::SECOND, 0, 0, 0, 0);
 
@@ -133,12 +129,18 @@ $timer.AutoReset = $true
 Register-ObjectEvent -InputObject $timer -EventName Elapsed -Action { $global:fsx.ReceiveMessage() } | out-null
 $timer.Start()
 
+if ($global:fsxError) {
+    $timer.Stop()
+    $global:fsx.Dispose()
+    throw 'Error: fsx.xml: There is at least one variable that SIMCONNECT does not recognize'
+}
+
 # Example transmit
 # Set Autopilot altitude reference in feet
 # transmit -eventId AP_ALT_VAR_SET_ENGLISH -param 4000
 
 # Print simulation variables
-# $global:response
+# $global:sim
 
 # Print altitude
-# $global:response.altitude
+# $global:sim.altitude
