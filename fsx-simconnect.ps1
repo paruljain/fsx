@@ -130,7 +130,7 @@ $global:fsx.RequestDataOnSimObject([DataRequests]::Request1, [Definitions]::Stru
 $timer = New-Object System.Timers.Timer
 $timer.Interval = 1000
 $timer.AutoReset = $true
-Register-ObjectEvent -InputObject $global:timer -EventName Elapsed -Action { $global:fsx.ReceiveMessage() } | out-null
+Register-ObjectEvent -InputObject $timer -EventName Elapsed -Action { $global:fsx.ReceiveMessage() } | out-null
 $timer.Start()
 
 # Example transmit
