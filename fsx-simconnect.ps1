@@ -34,7 +34,8 @@ if (-not ('Definitions' -as [type])) {
 Add-Type -TypeDefinition @"
 public enum Definitions
     {
-        Struct1
+        Struct1,
+        Init
     }
 "@
 }
