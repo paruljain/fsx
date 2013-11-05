@@ -4,10 +4,12 @@
 
     <!-- Simulation Variables. These provide data about current state of user aircraft -->
     <!-- Position -->
-    <var name="Plane Latitude" type="double" unit="radians"/>
-    <var name="Plane Longitude" type="double" unit="radians"/>
+    <var name="Plane Latitude" type="double" unit="degrees latitude"/>
+    <var name="Plane Longitude" type="double" unit="degrees longitude"/>
     <var name="Plane Altitude" type="double" unit="feet"/>
     <var name="Airspeed Indicated" type="double" unit="knots"/>
+	<var name="Plane Heading Degrees Magnetic" type="double" unit="degrees"/>
+	<var name="Plane Heading Degrees True" type="double" unit="degrees"/>
 
     <!-- Radios -->
     <var name="Com Active Frequency:1" type="double" unit="MHz"/>
