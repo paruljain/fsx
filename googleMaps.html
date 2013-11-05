@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <head>
+    <title>User Aircraft Position</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+
+    <script>
+
+// Returns a rotated image. Used for displaying plane icon pointing to correct heading
+function drawRotated(canvas, image, degrees){
+	var ctx = canvas.getContext('2d');
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	ctx.save();
+	ctx.translate(canvas.width/2,canvas.height/2);
+	ctx.rotate(degrees*Math.PI/180);
+	ctx.drawImage(image,-image.width/2,-image.width/2);
+	ctx.restore();
+	return canvas.toDataURL("image/png");
+}
+
+var map;
+var marker;
+var airplaneIcons = new Array();
+
+function initialize() {
+
+	var img = new Image();
+	img.onload = function(){
+		var canvas = document.getElementById('icon');
+		//ar ctx = can.getContext('2d');
+		airplaneIcons[0] = img;
+		airplaneIcons[360] = img;
+		for (var i=1; i < 360; i++) {
+			airplaneIcons[i] = drawRotated(canvas, img, i);
+		}
+		
+		var mapOptions = {
+			zoom: 14,
+			mapTypeId: google.maps.MapTypeId.ROADMAP,
+			center: new google.maps.LatLng(40.676344124391761, -74.178839612106174)
+		};
+	
+		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+		marker = new google.maps.Marker({
+			position: new google.maps.LatLng(40.676344124391761, -74.178839612106174),
+			map: map,
+			title: 'FSX',
+			icon: airplaneIcons[0]
+		});
+	}
+	img.src = 'airplane.png';
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+var ajaxGet = new XMLHttpRequest();
+var updater = setInterval(function() {
+	ajaxGet.open('GET', '/getall', false);
+	ajaxGet.send();
+	if (ajaxGet.readyState==4 && ajaxGet.status==200) {
+		var simData = JSON.parse(ajaxGet.responseText);
+		var planePos = new google.maps.LatLng(simData.Plane_Latitude, simData.Plane_Longitude);
+		if (marker) {
+			marker.setPosition(planePos);
+			//map.setCenter(planePos);
+			var heading = Math.round(simData.Plane_Heading_Degrees_True);
+			marker.setIcon(airplaneIcons[heading]);
+			marker.setTitle('HDG=' + heading + '\nALT=' + Math.round(simData.Plane_Altitude) + '\nSPD=' + Math.round(simData.Airspeed_Indicated));
+		}
+	}
+}, 1000);
+
+</script>
+</head>
+
+<body>
+	<div id="map-canvas"></div>
+	<canvas id="icon"></canvas>
+</body>
+
+</html>
