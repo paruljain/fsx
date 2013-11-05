@@ -21,16 +21,16 @@ REQUIRES
 --------
 * PowerShell v3 or higher
 * FSX SP2
-* .Net 4.5
+* .Net 4.5 or higher
 
 INSTALL
 -------
 
 1. Copy everything to any folder
 
-2. If you are running Windows Vista or better from an administratively privileged command prompt run the following command:
+2. If you are running Windows Vista or better from an administratively privileged command prompt run the following command after substituting DOMAIN\USER with your domain name and user ID:
    
-   netsh http add urlacl url=http://+:8000/ user=DOMAIN\user
+   netsh http add urlacl url=http://+:8000/ user=DOMAIN\USER
    
    The url should exactly match the url provided to listener.prefixes.add in the script. For other operating systems please refer to:
    
@@ -54,7 +54,7 @@ Start FSX. Now run the scripts. On 64 bit OS use the 32 bit (x86) version of Pow
     
 * fsxWebServer.ps1
 
-   This script is a micro web server that servers SIMCONNECT over a RESTful API.
+   This script is a micro web server that serves SIMCONNECT over a RESTful API.
    * HTTP GET to /getall gets value of simulation variables configured in fsx.xml in JSON format
    * HTTP POST to /cmd allows transmission of events to FSX used to control user aircraft. The HTTP header must have Content-Type set to application/json. The body must be a JSON object as follows:
 
