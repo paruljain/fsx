@@ -1,63 +1,79 @@
-Microsoft Flight Simulator (FSX) RESTful API and user interface to control user aircraft
-========================================================================================
+Microsoft Flight Simulator (FSX) RESTful API
+============================================
 
-Provides easy to use interface to FSX via SIMCONNECT. This makes it easy to build scripts to control user aircraft, and also build web technology RESTful interface for direct consumption by Javascript apps running within web browsers for rich user interface on any device including PC, tablets, and smart phones.
+Provides easy to use interfaces to FSX via SIMCONNECT:
 
-The *fsx-simmconnect.ps1* script is a pure PowerShell interface to SIMCONNECT.DLL managed interface library for FSX. It allows event IDs (events that you want to trasmit to FSX to control aircraft) and simulation variables (these variables represent the current state of simulation) to be specified in fsx.xml file. You can then use the *trasnmit* function to send events and use *$global:response* variable to monitor the variables. *$global:response* is automatically updated once every second.
-
-The script solves two common issues when working with SIMCONNECT managed library. It does not need a Windows Form element to work (so it works with PowerShell console app) and the *transmit* function accepts negative integers used for reversing engine thrust, operating brakes, and controlling AXIS type controls.
+* PowerShell scripts
+* AJAX from Javascript within browser for rich GUI apps that can run on any device (including tablets!)
+* Languages such as Ruby, Python, Java, c#, PERL that make it easy to consume RESTful API
 
 FEATURES
 --------
-    * Open source
-    * Pure PowerShell with no dependencies
-    * Control aircraft from tablets, smart phones, PC, Mac
-    * Use multiple devices at once (no limit)
-    * Very easy to develop your own control dashboards using HTML (and Javascript for advanced customization)
-    * Create user interface for each aircraft, for each screen size, and then load the appropriate one
-    * Load different interface on each device. For example, use tablet 1 for Auto Pilot controls, tablet 2 for Radio etc.
-    * No tools required to extend and customize. All you need is Notepad
+* Open source
+* Pure PowerShell with no dependencies
+* Micro web server in PowerShell; IIS not required
+* Control aircraft from tablets, smart phones, PC, Mac
+* Use multiple devices at once (no limit)
+* Very easy to develop your own apps using PowerShell, HTML + Javascript or any language that can consume RESTful API
+* No tools required to extend and customize. All you need is Notepad
 
 REQUIRES
 --------
-    PowerShell v3 or higher, FSX SP2, .Net 4.5, fsx.xml (included with the script)
+* PowerShell v3 or higher
+* FSX SP2
+* .Net 4.5
 
 INSTALL
 -------
-      1  Copy the script fsx.ps1 and configuration file fsx.xml to any folder.
-      
-      2  If you are running Windows Vista or better from an administratively privileged command prompt run the following command:
-          netsh http add urlacl url=http://+:8000/ user=DOMAIN\user
-          The url should exactly match the url provided to listener.prefixes.add in the script
-      
-          For other operating systems please refer to:
-          http://msdn.microsoft.com/en-us/library/ms733768.aspx
-          
-      3  Allow inbound TCP connections to port 8000 from your network in Windows firewall
-      
-      4  If you are running 64 bit OS, start the 32 bit (x86) version of PowerShell with administrative privileges.     
-          if you are running 32 bit OS, start PowerShell with administrative privileges
-          Execute the following command on PowerShell prompt:
-          
-          set-executionpolicy bypass
-          
-          This will allow 32 bit PowerShell scripts to run on your system unrestricted. If you get access denied error
-          while running this command you are not running PowerShell in administratively privileged mode
+
+1. Copy everything to any folder
+
+2. If you are running Windows Vista or better from an administratively privileged command prompt run the following command:
+   
+   netsh http add urlacl url=http://+:8000/ user=DOMAIN\user
+   
+   The url should exactly match the url provided to listener.prefixes.add in the script. For other operating systems please refer to:
+   
+   http://msdn.microsoft.com/en-us/library/ms733768.aspx
+    
+3. Allow inbound TCP connections to port 8000 from your network in Windows firewall
+
+4. If you are running 64 bit OS, start the 32 bit (x86) version of PowerShell with administrative privileges. If you are running 32 bit OS, start PowerShell with administrative privileges and execute the following command on PowerShell prompt:
+    
+   set-executionpolicy bypass
+    
+  This will allow 32 bit PowerShell scripts to run on your system unrestricted. If you get access denied error    while running this command you are not running PowerShell in administratively privileged mode.
 
 USAGE
 -----
-Start FSX. Now run the script. On 64 bit OS use the 32 bit (x86) version of PowerShell. This is because SIMCONNECT library and FSX are 32 bit apps. From a command prompt change to folder where script is located and then type:
+Start FSX. Now run the scripts. On 64 bit OS use the 32 bit (x86) version of PowerShell. This is because SIMCONNECT library and FSX are 32 bit apps.
+
+* fsxSimConnect.ps1
+
+   This script provides the interface to FSX via SIMCONNECT and is the basis for all other scripts
     
-    powershell .\fsx.ps1
-    
-If all goes well you will see "Listening ..." on the console
-    
+* fsxWebServer.ps1
+
+   This script is a micro web server that servers SIMCONNECT over a RESTful API.
+   * HTTP GET to /getall gets value of simulation variables configured in fsx.xml in JSON format
+   * HTTP POST to /cmd allows transmission of events to FSX used to control user aircraft. The HTTP header must have Content-Type set to application/json. The body must be a JSON object as follows:
+
+```
+   {"cmd":<name of eventid to send to FSX per fsx.xml>}
+
+      or
+
+   {"cmd":<name of eventid to send to FSX per fsx.xml>, "param":<parameter that needs to be sent with the command>}
+
+   Turn on Autopilot: {"cmd":"AUTOPILOT_ON'}
+   Set autopilot ALT reference to 3000ft:  {"cmd":"AP_ALT_VAR_SET_ENGLISH", "param":3000}
+   Release left brake: {"cmd":"AXIS_LEFT_BRAKE_SET", "param":-16383}
+```
+
 To test the RESTful interface you can use the Chrome browser with the "Simple REST Client" plugin available free from Chrome market place. On the computer where the script is running start Chrome, and start the Simple REST Client:
     
     URL: http://localhost:8000/getall
     Method: GET
-
-Press Send.
 
 You should see all the simulation variable values such as altitude of user aircraft etc. You can add or remove simulation variables (there are hundreds) in the fsx.xml file. You will have to restart the script whenever you make changes to the fsx.xml file.
 
@@ -70,4 +86,14 @@ You can also send a command to FSX from Chrome Simple REST Client.
 
 Press Send. The Autopilot on your aircraft should be engaged. To turn it off send AUTOPILOT_OFF. Look at the fsx.xml event IDs to see what commands you can send. You can add more events to fsx.xml.
 
-You can test connection from other computers as well. Instead of localhost use the IP address of the computer running the script. You can now write programs in any language on any computer to control FSX. You can also write Javascript programs to run within browser so that you can have rich user interface. Sample browser apps will be provided in the near future.
+* googleMaps.html
+   
+   This Javascript app is a demonstration of how the RESTful API can be consumed in a browser to build great UI apps that can run on any device. This app shows the position of user aircraft on Google Maps refreshed every second. Hover above the plane icon to see the aircraft's true heading, altitude in feet, and indicated airspeed in knots. To use this application open the following URL from a browser that supports HTML5:
+
+```   
+   http://localhost:8000/googleMaps.html
+
+   or
+   
+   http://<ip address of computer running script>:8000/googleMaps.html
+```
