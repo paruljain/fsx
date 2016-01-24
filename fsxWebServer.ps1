@@ -3,7 +3,7 @@
 $scriptPath = Split-Path -parent $MyInvocation.MyCommand.Definition
 
 if (!$global:fsxConnected) {
-    . "$scriptPath\fsx-simconnect.ps1"
+    . "$scriptPath\fsxSimconnect.ps1"
 }
 
 # Shorthand to send string data back to client over HTTP
