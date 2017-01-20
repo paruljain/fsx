@@ -3,7 +3,7 @@
 $scriptPath = Split-Path -parent $MyInvocation.MyCommand.Definition
 
 if (!$global:fsxConnected) {
-    . "$scriptPath\fsx-simconnect.ps1"
+    . "$scriptPath\fsxSimconnect.ps1"
     # Wait for variables to come in
     Start-Sleep -Seconds 2
 }
