@@ -30,6 +30,17 @@ while ($global:fsxConnected) {
     $request = $context.Request
     $response = $context.Response
 
+    #### LEO ###
+    # from https://stackoverflow.com/questions/36975619/how-to-call-a-rest-web-service-api-from-javascript-button-handler
+ #   if ($request.HttpMethod == "OPTIONS")
+ #   {
+    $response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With");
+    $response.AddHeader("Access-Control-Allow-Methods", "GET, POST");
+    $response.AddHeader("Access-Control-Max-Age", "1728000");
+ #   }
+    $response.AddHeader("Access-Control-Allow-Origin", "*");
+    #### LEO ###
+
     # Equivalent to 'routes' in other frameworks
     if ($request.RawUrl -match '/cmd' -and $request.HttpMethod -eq'POST' `
         -and $request.HasEntityBody -and $request.ContentType -match 'application/json') {
